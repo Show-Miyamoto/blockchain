@@ -41,14 +41,28 @@ class BlockChain(object):
         return hashlib.sha256(sorted_block.encode()).hexdigest()
 
     def add_transaction(self, sender_blockchain_address,
-                        recipient_blockchain_address, value):
+                        recipient_blockchain_address, value,
+                        sender_public_key=None, signature=None):
         transaction = utils.sorted_dict_by_key({
             'sender_blockchain_address': sender_blockchain_address,
             'recipient_blockchain_address': recipient_blockchain_address,
             'value': float(value)
         })
-        self.transaction_pool.append(transaction)
-        return True
+
+        if sender_blockchain_address == MINING_SENDER:
+            self.transaction_pool.append(transaction)
+            return True
+
+        if self.verify_transaction_signature(
+                sender_public_key, signature, transaction):
+
+            #if self.calculate_total_amount(sender_blockchain_address) < float(value):
+             #   logger.error({'action': 'add_transaction', 'error': 'no_value'})
+              #  return False
+
+            self.transaction_pool.append(transaction)
+            return True
+        return False
 
     def verify_transaction_signature(
             self, sender_public_key, signature, transaction):
@@ -100,22 +114,3 @@ class BlockChain(object):
                 if blockchain_address == transaction['sender_blockchain_address']:
                     total_amount -= value
         return total_amount
-
-
-if __name__ == '__main__':
-    my_blockchian_address = 'my_blockchain_address'
-    block_chain = BlockChain(blockchain_address=my_blockchian_address)
-    utils.pprint(block_chain.chain)
-
-    block_chain.add_transaction('A', 'B', 1.0)
-    block_chain.mining()
-    utils.pprint(block_chain.chain)
-
-    block_chain.add_transaction('C', 'D', 2.0)
-    block_chain.add_transaction('X', 'Y', 3.0)
-    block_chain.mining()
-    utils.pprint(block_chain.chain)
-
-    print('my', block_chain.calculate_total_amount(my_blockchian_address))
-    print('C', block_chain.calculate_total_amount('C'))
-    print('D', block_chain.calculate_total_amount('D'))
