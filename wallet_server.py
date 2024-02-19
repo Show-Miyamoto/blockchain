@@ -8,7 +8,7 @@ app = Flask(__name__, template_folder='./templates')
 
 @app.route('/')
 def index():
-    return render_templeate('./index.html')
+    return render_template('./index.html')
 
 
 if __name__ == '__main__':
