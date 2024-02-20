@@ -45,7 +45,7 @@ def transaction():
         required = (
             'sender_blockchain_address',
             'recipient_blockchain_address',
-            'valeu',
+            'value',
             'sender_public_key',
             'signature')
         if not all(k in request_json for k in required):
